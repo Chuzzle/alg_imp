@@ -13,12 +13,27 @@ static void done(int unused)
 	unused = unused;
 }
 
-signed long long readint(FILE* file) {
+int readInt(char* c) {
+	int value;
 
+	while (*c && !isdigit(*c)) {
+		c++;
+	}
+	if (!*c) {
+		return NULL;
+	}
+	while (*c && isidigit(*c)) {
+		value = 10*value + *c - '0';
+		c++;
+	}
+	return value;
 }
 
 unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
+	char* helpStr[BUFSIZ];
+	int x, rows, cols;
+
 	FILE*		afile = fopen(aname, "r");
 	FILE*		cfile = fopen(cname, "r");
 
@@ -34,8 +49,11 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
+//	while(fgets(helpStr, BUFSIZ, afile)) {
+
+	}
 	/* read A and c files. */
-	
+
 
 	fclose(afile);
 	fclose(cfile);
