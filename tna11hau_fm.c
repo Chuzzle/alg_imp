@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <ctype.h>
 
 static unsigned long long	fm_count;
 static volatile bool		proceed = false;
@@ -20,9 +21,10 @@ int readInt(char* c) {
 		c++;
 	}
 	if (!*c) {
-		return NULL;
+		fprintf(stderr, "Rows or cols are wrong\n");
+		exit(1);
 	}
-	while (*c && isidigit(*c)) {
+	while (*c && isdigit(*c)) {
 		value = 10*value + *c - '0';
 		c++;
 	}
@@ -31,8 +33,8 @@ int readInt(char* c) {
 
 unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
-	char* helpStr[BUFSIZ];
-	int x, rows, cols;
+	char helpStr[BUFSIZ];
+	int rows, cols, k, n;
 
 	FILE*		afile = fopen(aname, "r");
 	FILE*		cfile = fopen(cname, "r");
@@ -49,11 +51,38 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
-//	while(fgets(helpStr, BUFSIZ, afile)) {
 
+	// Read rows and cols
+
+	// Read the right number of numbers in each row
+	if(!fgets(helpStr, BUFSIZ, afile)) {
+		fprintf(stderr, "Something is wrong in file A\n");
+		exit(1);
 	}
-	/* read A and c files. */
+	rows = readInt(helpStr);
+	cols = readInt(helpStr);
 
+	// Initialize the correct data structure
+
+	for (k = 1; k >= rows; k++) {
+		for (n = 1; n >= cols; n++) {
+			// Store the ints in the structure.
+		}
+	}
+
+	if (!fgets(helpStr, BUFSIZ, cfile)) {
+		fprintf(stderr, "Something is wrong in file C\n");
+		exit(1);
+	}
+
+	if (readInt(helpStr) != rows) {
+		fprintf(stderr, "A and C files do not match\n");
+		exit(1);
+	}
+
+	for(k = 1; k>= rows; k++) {
+		//read and store C things
+	}
 
 	fclose(afile);
 	fclose(cfile);
