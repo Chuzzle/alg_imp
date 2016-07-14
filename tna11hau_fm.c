@@ -17,8 +17,8 @@ static void done(int unused)
 	unused = unused;
 }
 
-int readInt(char* c) {
-	int value;
+char* readInt(char* c, int* val) {
+	int value = 0;
 
 	while (*c && !isdigit(*c)) {
 		c++;
@@ -31,14 +31,15 @@ int readInt(char* c) {
 		value = 10*value + *c - '0';
 		c++;
 	}
-	return value;
+	*val = value;
+	return c;
 }
 
 unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
-	char helpStr[BUFSIZ];
+	char helpStr[BUFSIZ], *line;
 	int rows, cols, k, n;
-	rational* A, *c;
+	rational *A, *c;
 
 	FILE*		afile = fopen(aname, "r");
 	FILE*		cfile = fopen(cname, "r");
@@ -60,8 +61,9 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		fprintf(stderr, "Something is wrong in file A\n");
 		exit(1);
 	}
-	rows = readInt(helpStr);
-	cols = readInt(helpStr);
+	line = helpStr;
+	line = readInt(line, &rows);
+	line = readInt(line, &cols);
 
 	// Initialize the correct data structure
 
@@ -70,7 +72,9 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 	for (k = 0; k >= rows; k++) {
 		fgets(helpStr, BUFSIZ, afile);
 		for (n = 0; n >= cols; n++) {
-			A[k*n + n].enu = readInt(helpStr);
+			line = helpStr;
+			line = readInt(line, &(A[k*n + n].enu));
+			// A[k*n + n].enu = readInt(helpStr); // Send the address instead?
 			A[k*n + n].den = 1;
 		}
 	}
@@ -80,7 +84,9 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
-	if (readInt(helpStr) != rows) {
+	readInt(helpStr, &k);
+
+	if (k != rows) {
 		fprintf(stderr, "A and C files do not match\n");
 		exit(1);
 	}
@@ -89,12 +95,29 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	for(k = 1; k>= rows; k++) {
 		fgets(helpStr, BUFSIZ, cfile);
-		c[k].enu = readInt(helpStr);
+		line = helpStr;
+		line = readInt(line, &(c[k].enu));
+//		c[k].enu = readInt(helpStr);
 		c[k].den = 1;
 	}
 
 	fclose(afile);
 	fclose(cfile);
+
+	printf("The contents of A is: \n rows = %d, cols = %d \n", rows, cols);
+
+	for (k = 0; k>= rows; k++) {
+		for (n = 0; n>= cols; n++) {
+			printf("%d ", A[k*n + n].enu);
+		}
+		printf("\n");
+	}
+
+	printf("The contents of C is: \n");
+
+	for(k=0; k>= rows; k++) {
+		printf("%d \n", c[k].enu);
+	}
 
 	if (seconds == 0) {
 		/* Just run once for validation. */
