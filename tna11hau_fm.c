@@ -38,6 +38,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
 	char helpStr[BUFSIZ];
 	int rows, cols, k, n;
+	// rational* A, *c;
 
 	FILE*		afile = fopen(aname, "r");
 	FILE*		cfile = fopen(cname, "r");
@@ -64,9 +65,13 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	// Initialize the correct data structure
 
+	// A = calloc();
+
 	for (k = 1; k >= rows; k++) {
+		// fgets(helpStr, BUFSIZ, afile);
 		for (n = 1; n >= cols; n++) {
-			// Store the ints in the structure.
+			// A[k][n]->enu = readInt(helpStr);
+			// A[k][n]->deno = 1;
 		}
 	}
 
@@ -80,8 +85,12 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
+	// c = calloc();
+
 	for(k = 1; k>= rows; k++) {
-		//read and store C things
+		// fgets(helpStr, BUFSIZ, cfile);
+		// c[k]->enu = readInt(helpStr);
+		// c[k]->deno = 1;
 	}
 
 	fclose(afile);

@@ -19,3 +19,10 @@ void divide(rational* left, rational* right) {
   mult(left, right);
   inverse(right);
 };
+
+bool compare(rational* left, rational* right) {
+  int lh, rh;
+  lh = left->enu * right->den;
+  rh = right->enu * left->den;
+  return lh>rh;
+};
