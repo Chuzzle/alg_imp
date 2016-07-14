@@ -14,7 +14,7 @@ void inverse(rational* value) {
   value->den = k;
 }
 
-void div(rational* left, rational* right) {
+void divide(rational* left, rational* right) {
   inverse(right);
   mult(left, right);
   inverse(right);

@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#include "fm_elim.c"
+#include "rational.c"
+
 static unsigned long long	fm_count;
 static volatile bool		proceed = false;
 
@@ -50,9 +53,6 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		fprintf(stderr, "could not open file c\n");
 		exit(1);
 	}
-
-
-	// Read rows and cols
 
 	// Read the right number of numbers in each row
 	if(!fgets(helpStr, BUFSIZ, afile)) {
