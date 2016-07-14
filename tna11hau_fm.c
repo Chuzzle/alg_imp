@@ -38,7 +38,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
 	char helpStr[BUFSIZ];
 	int rows, cols, k, n;
-	// rational* A, *c;
+	rational* A, *c;
 
 	FILE*		afile = fopen(aname, "r");
 	FILE*		cfile = fopen(cname, "r");
@@ -65,13 +65,13 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	// Initialize the correct data structure
 
-	// A = calloc();
+	A = calloc(rows*cols, sizeof(rational));
 
-	for (k = 1; k >= rows; k++) {
-		// fgets(helpStr, BUFSIZ, afile);
-		for (n = 1; n >= cols; n++) {
-			// A[k][n]->enu = readInt(helpStr);
-			// A[k][n]->deno = 1;
+	for (k = 0; k >= rows; k++) {
+		fgets(helpStr, BUFSIZ, afile);
+		for (n = 0; n >= cols; n++) {
+			A[k*n + n].enu = readInt(helpStr);
+			A[k*n + n].den = 1;
 		}
 	}
 
@@ -85,12 +85,12 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
-	// c = calloc();
+	c = calloc(rows, sizeof(rational));
 
 	for(k = 1; k>= rows; k++) {
-		// fgets(helpStr, BUFSIZ, cfile);
-		// c[k]->enu = readInt(helpStr);
-		// c[k]->deno = 1;
+		fgets(helpStr, BUFSIZ, cfile);
+		c[k].enu = readInt(helpStr);
+		c[k].den = 1;
 	}
 
 	fclose(afile);
@@ -112,10 +112,11 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 	proceed = true;
 	while (proceed) {
 		// Uncomment when your function and variables exist...
-		// fm_elim(rows, cols, a, c);
+		// fm_elim(rows, cols, A, c);
 
 		fm_count++;
 	}
-
+	free(A);
+	free(c);
 	return fm_count;
 }
