@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "fm_elim.c"
 #include "rational.c"
@@ -18,9 +19,12 @@ static void done(int unused)
 }
 
 char* readInt(char* c, int* val) {
-	int value = 0;
+	int value = 0, sign = 1;
 
 	while (*c && !isdigit(*c)) {
+		if (c[0] == '-') {
+			sign = -1;
+		}
 		c++;
 	}
 	if (!*c) {
@@ -31,7 +35,8 @@ char* readInt(char* c, int* val) {
 		value = 10*value + *c - '0';
 		c++;
 	}
-	*val = value;
+	printf("%d \n", value);
+	*val = sign*value;
 	return c;
 }
 
@@ -69,14 +74,15 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	A = calloc(rows*cols, sizeof(rational));
 
-	for (k = 0; k >= rows; k++) {
+	for (k = 0; k < rows; k++) {
 		fgets(helpStr, BUFSIZ, afile);
-		for (n = 0; n >= cols; n++) {
-			line = helpStr;
+		line = helpStr;
+		for (n = 0; n < cols; n++) {
 			line = readInt(line, &(A[k*n + n].enu));
-			// A[k*n + n].enu = readInt(helpStr); // Send the address instead?
 			A[k*n + n].den = 1;
+			//printf("%d ", A[k*n + n].enu);
 		}
+		printf("\n");
 	}
 
 	if (!fgets(helpStr, BUFSIZ, cfile)) {
@@ -93,11 +99,10 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	c = calloc(rows, sizeof(rational));
 
-	for(k = 1; k>= rows; k++) {
+	for(k = 0;  k < rows; k++) {
 		fgets(helpStr, BUFSIZ, cfile);
 		line = helpStr;
 		line = readInt(line, &(c[k].enu));
-//		c[k].enu = readInt(helpStr);
 		c[k].den = 1;
 	}
 
@@ -106,8 +111,8 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	printf("The contents of A is: \n rows = %d, cols = %d \n", rows, cols);
 
-	for (k = 0; k>= rows; k++) {
-		for (n = 0; n>= cols; n++) {
+	for (k = 0; k < rows; k++) {
+		for (n = 0; n < cols; n++) {
 			printf("%d ", A[k*n + n].enu);
 		}
 		printf("\n");
@@ -115,7 +120,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	printf("The contents of C is: \n");
 
-	for(k=0; k>= rows; k++) {
+	for(k = 0; k < rows; k++) {
 		printf("%d \n", c[k].enu);
 	}
 
