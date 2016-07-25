@@ -22,7 +22,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
 	char helpStr[BUFSIZ], *line;
 	int rows, cols, k, n;
-	rational *A, *c;
+	int *A, *c;
 
 	FILE*		afile = fopen(aname, "r");
 	FILE*		cfile = fopen(cname, "r");
@@ -50,15 +50,15 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 	cols = strtol(line, &line, 0);
 	// Initialize the correct data structure
 
-	A = calloc(rows*cols, sizeof(rational));
+	A = calloc(rows*cols, sizeof(long int));
 
 	for(k = 0; k < rows; k++) {
 		fgets(helpStr, BUFSIZ, afile);
 		line = helpStr;
 		for (n=0; n < cols; n++) {
-			A[k*n + n].enu = strtol(line, &line, 0);
-			A[k*n + n].den = 1;
-			printf("%d ", A[k*n+n].enu);
+			A[k*cols + n] = strtol(line, &line, 0);
+			//A[k*n + n].den = 1;
+			printf("%d%d %d ", k, n, k*n+n);
 		}
 		printf("\n");
 	}
@@ -75,13 +75,13 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
-	c = calloc(rows, sizeof(rational));
+	c = calloc(rows, sizeof(long int));
 
 	for (k=0; k < rows; k++) {
 		fgets(helpStr, BUFSIZ, cfile);
 		line = helpStr;
-		c[k].enu = strtol(line, &line, 0);
-		c[k].den = 1;
+		c[k] = strtol(line, &line, 0);
+		//c[k].den = 1;
 	}
 
 	fclose(afile);
@@ -91,7 +91,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	for (k = 0; k < rows; k++) {
 		for (n = 0; n < cols; n++) {
-			printf("%d ", A[k*n + n].enu);
+			printf("%d ", A[k*cols + n]);
 		}
 		printf("\n");
 	}
@@ -99,7 +99,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 	printf("The contents of C is: \n");
 
 	for(k = 0; k < rows; k++) {
-		printf("%d \n", c[k].enu);
+		printf("%d \n", c[k]);
 	}
 
 	if (seconds == 0) {
