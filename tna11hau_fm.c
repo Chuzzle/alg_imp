@@ -18,28 +18,6 @@ static void done(int unused)
 	unused = unused;
 }
 
-char* readInt(char* c, int* val) {
-	int value = 0, sign = 1;
-
-	while (*c && !isdigit(*c)) {
-		if (c[0] == '-') {
-			sign = -1;
-		}
-		c++;
-	}
-	if (!*c) {
-		fprintf(stderr, "Rows or cols are wrong\n");
-		exit(1);
-	}
-	while (*c && isdigit(*c)) {
-		value = 10*value + *c - '0';
-		c++;
-	}
-	printf("%d \n", value);
-	*val = sign*value;
-	return c;
-}
-
 unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
 	char helpStr[BUFSIZ], *line;
@@ -66,21 +44,21 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		fprintf(stderr, "Something is wrong in file A\n");
 		exit(1);
 	}
-	line = helpStr;
-	line = readInt(line, &rows);
-	line = readInt(line, &cols);
 
+	line = helpStr;
+	rows = strtol(line, &line, 0);
+	cols = strtol(line, &line, 0);
 	// Initialize the correct data structure
 
 	A = calloc(rows*cols, sizeof(rational));
 
-	for (k = 0; k < rows; k++) {
+	for(k = 0; k < rows; k++) {
 		fgets(helpStr, BUFSIZ, afile);
 		line = helpStr;
-		for (n = 0; n < cols; n++) {
-			line = readInt(line, &(A[k*n + n].enu));
+		for (n=0; n < cols; n++) {
+			A[k*n + n].enu = strtol(line, &line, 0);
 			A[k*n + n].den = 1;
-			//printf("%d ", A[k*n + n].enu);
+			printf("%d ", A[k*n+n].enu);
 		}
 		printf("\n");
 	}
@@ -90,19 +68,19 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		exit(1);
 	}
 
-	readInt(helpStr, &k);
+	line = helpStr;
 
-	if (k != rows) {
+	if (strtol(line, &line, 0) != rows) {
 		fprintf(stderr, "A and C files do not match\n");
 		exit(1);
 	}
 
 	c = calloc(rows, sizeof(rational));
 
-	for(k = 0;  k < rows; k++) {
+	for (k=0; k < rows; k++) {
 		fgets(helpStr, BUFSIZ, cfile);
 		line = helpStr;
-		line = readInt(line, &(c[k].enu));
+		c[k].enu = strtol(line, &line, 0);
 		c[k].den = 1;
 	}
 
