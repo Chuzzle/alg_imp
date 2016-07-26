@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 typedef struct {
   int enu;
   int den;
@@ -20,9 +22,10 @@ void divide(rational* left, rational* right) {
   inverse(right);
 };
 
-bool compare(rational* left, rational* right) {
+int compare(rational* left, rational* right) {
   int lh, rh;
   lh = left->enu * right->den;
   rh = right->enu * left->den;
-  return lh>rh;
+  printf("left = %d, right = %d \n", lh, rh);
+  return lh<rh;
 };
