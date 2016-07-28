@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "fm_elim.c"
-#include "rational.c"
 
 static unsigned long long	fm_count;
 static volatile bool		proceed = false;
@@ -89,8 +88,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		/* Just run once for validation. */
 
 		// Uncomment when your function and variables exist...
-		// return fm_elim(rows, cols, a, c);
-		return 1; // return one, i.e. has a solution for now...
+		return fm_elim(rows, cols, A, c);
 	}
 
 	/* Tell operating system to call function DONE when an ALARM comes. */
@@ -101,8 +99,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 	proceed = true;
 	while (proceed) {
 		// Uncomment when your function and variables exist...
-		// fm_elim(rows, cols, A, c);
-
+		fm_elim(rows, cols, A, c);
 		fm_count++;
 	}
 	free(A);
