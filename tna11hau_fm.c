@@ -20,7 +20,7 @@ static void done(int unused)
 unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 {
 	char helpStr[BUFSIZ], *line;
-	int rows, cols, k, n;
+	int rows, cols, k, n, res;
 	rational *A, *c;
 
 	FILE*		afile = fopen(aname, "r");
@@ -86,9 +86,11 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 
 	if (seconds == 0) {
 		/* Just run once for validation. */
-
 		// Uncomment when your function and variables exist...
-		return fm_elim(rows, cols, A, c);
+		res = fm_elim(rows, cols, A, c);
+		free(A);
+		free(c);
+		return res;
 	}
 
 	/* Tell operating system to call function DONE when an ALARM comes. */
