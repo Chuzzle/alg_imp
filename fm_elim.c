@@ -27,7 +27,7 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
     num_lower = 0;
     for (k = 0; k < rows; k++) {
       working_number = &data_A[partition_size_A*part_ind + k*cols + cols - 1];
-      printf("The working number in row %d is %d / %d \n", k, working_number->enu, working_number->den);
+      // printf("The working number in row %d is %d / %d \n", k, working_number->enu, working_number->den);
       // Identify which rows have a negative/positive/zero coefficient, to determine which will yield a lower bound and which will yield an upper bound
       if (working_number->enu > 0) {
         num_upper++;
@@ -41,12 +41,12 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
         indicators[k] = -1;
         for (n = 0; n < cols; n++) {
           divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
-
         }
         divide(&data_c[partition_size_c*part_ind + k], working_number);
       } else {
         indicators[k] = 0;
       }
+      printf("The new value in c at row %d is: %d / %d \n", k, data_c[partition_size_c*part_ind + k].enu, data_c[partition_size_c*part_ind +k].den);
     }
 
     if (cols == 1) {
@@ -96,17 +96,13 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
   for (k = 0; k < rows; k++) {
     working_number = &data_A[part_ind*partition_size_A + k];
     help = &data_c[part_ind*partition_size_c + k];
-    printf("Ind = %d \n", indicators[k]);
-    printf("c_k = %d / %d \n", help->enu, help->den);
     if (indicators[k] < 0) {
       if (compare(&min, help)) {
         min = *help;
-        printf("min = %d / %d \n", min.enu, min.den);
       }
     } else if (indicators[k] > 0) {
       if (compare(help, &max)) {
         max = *help;
-        printf("max = %d / %d \n", max.enu, max.den);
       }
     } else {
       if (compare_int(help, 0)) {
@@ -115,9 +111,8 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
         return 0;
       }
     }
-
   }
-  printf("max = %d / %d, min = %d / %d \n", max.enu, max.den, min.enu, min.den);
+
   free(data_A);
   free(data_c);
   return compare(&min, &max);
