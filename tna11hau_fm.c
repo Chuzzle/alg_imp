@@ -56,7 +56,7 @@ unsigned long long tna11hau_fm(char* aname, char* cname, int seconds)
 		line = helpStr;
 		for (n=0; n < cols; n++) {
 			A[k*cols + n].enu = strtol(line, &line, 0);
-			A[k*n + n].den = 1;
+			A[k*cols + n].den = 1;
 		}
 	}
 

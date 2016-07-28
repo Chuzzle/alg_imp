@@ -39,7 +39,7 @@ bool compare(rational* left, rational* right) {
   int lh, rh;
   lh = left->enu * right->den;
   rh = right->enu * left->den;
-  return lh>rh;
+  return lh<rh;
 };
 
 int compare_int(rational* left, int right) {

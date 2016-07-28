@@ -22,11 +22,12 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
   }
 
   //Start of the algorithm.
-  while (cols > 1) {
+  while (cols > 0) {
     num_upper = 0;
     num_lower = 0;
     for (k = 0; k < rows; k++) {
-      working_number = &data_A[partition_size_A*part_ind + k*cols + cols];
+      working_number = &data_A[partition_size_A*part_ind + k*cols + cols - 1];
+      printf("The working number in row %d is %d / %d \n", k, working_number->enu, working_number->den);
       // Identify which rows have a negative/positive/zero coefficient, to determine which will yield a lower bound and which will yield an upper bound
       if (working_number->enu > 0) {
         num_upper++;
@@ -34,21 +35,23 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
         for (n = 0; n < cols; n++) {
           divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
         }
+        divide(&data_c[partition_size_c*part_ind + k], working_number);
       } else if (working_number->enu < 0) {
         num_lower++;
         indicators[k] = -1;
         for (n = 0; n < cols; n++) {
           divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
+
         }
+        divide(&data_c[partition_size_c*part_ind + k], working_number);
       } else {
         indicators[k] = 0;
       }
-      // On the same loop, divide each coefficient in that row so we have a 1 at the "right" place
-
-      // Same for the c vector
-      divide(&data_c[partition_size_c*part_ind + k], working_number);
     }
 
+    if (cols == 1) {
+      break;
+    }
     // Find the new rows
     rows_new = rows - (num_lower + num_upper) + num_lower*num_upper;
     if (rows_new == 0) {
@@ -56,7 +59,7 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
       free(data_c);
       return 1;
     } else if (rows_new >= partition_size_c){
-      printf("Out of memory D:");
+      printf("Out of memory");
       exit(1);
     }
     // Construct the new matrix. Note that I will need different row-indices for this.
@@ -67,21 +70,23 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
         for(k2 = 0; k2 < rows; k2++) {
           if (indicators[k2] == -1) {
             for (n = 0; n < cols_new; n++) {
-              data_A[(part_ind%2)*partition_size_A + k_new*cols_new + n] = sub(&data_A[part_ind*partition_size_A + k*cols + n], &data_A[part_ind*partition_size_A + k2*cols + n]);
+              data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n] = sub(&data_A[part_ind*partition_size_A + k*cols + n], &data_A[part_ind*partition_size_A + k2*cols + n]);
             }
+            data_c[((part_ind + 1)%2)*partition_size_c + k_new] = sub(&data_c[part_ind*partition_size_c + k], &data_c[part_ind*partition_size_c + k2]);
             k_new++;
           }
         }
       } else if (indicators[k] == 0) {
         for (n = 0; n < cols_new; n++) {
-          data_A[(part_ind%2)*partition_size_A + k_new*cols_new + n] = data_A[part_ind*partition_size_A + k*cols + n];
-          k_new++;
+          data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n] = data_A[part_ind*partition_size_A + k*cols + n];
         }
+        data_c[((part_ind + 1)%2)*partition_size_c + k_new] = data_c[part_ind*partition_size_c + k];
+        k_new++;
       }
     }
     rows = rows_new;
     cols = cols_new;
-    part_ind++;
+    part_ind = (part_ind+1)%2;
   }
   min.enu = INT_MIN;
   min.den = 1;
@@ -91,21 +96,28 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
   for (k = 0; k < rows; k++) {
     working_number = &data_A[part_ind*partition_size_A + k];
     help = &data_c[part_ind*partition_size_c + k];
-    if (compare_int(working_number, 0)) {
+    printf("Ind = %d \n", indicators[k]);
+    printf("c_k = %d / %d \n", help->enu, help->den);
+    if (indicators[k] < 0) {
       if (compare(&min, help)) {
         min = *help;
-      } else if (equal_int(working_number, 0)) {
-        if (compare_int(help, 0)) {
-          free(data_A);
-          free(data_c);
-          return 0;
-        }
-      } else if (compare(help, &max)) {
+        printf("min = %d / %d \n", min.enu, min.den);
+      }
+    } else if (indicators[k] > 0) {
+      if (compare(help, &max)) {
         max = *help;
+        printf("max = %d / %d \n", max.enu, max.den);
+      }
+    } else {
+      if (compare_int(help, 0)) {
+        free(data_A);
+        free(data_c);
+        return 0;
       }
     }
-  }
 
+  }
+  printf("max = %d / %d, min = %d / %d \n", max.enu, max.den, min.enu, min.den);
   free(data_A);
   free(data_c);
   return compare(&min, &max);
