@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "rational.c"
 
 #define BUFFER_SIZE (10)
 
 int fm_elim(int rows, int cols, rational* A, rational* c) {
-  rational* data_A, *data_c, *working_number;
+  rational* data_A, *data_c, *working_number, *help, min, max;
   int k, n, k_new, k2, part_ind = 0, partition_size_A = rows*cols*BUFFER_SIZE, partition_size_c = rows*BUFFER_SIZE;
   int indicators[rows*BUFFER_SIZE], num_lower, num_upper, rows_new=0, cols_new;
 
@@ -26,21 +27,24 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
     num_lower = 0;
     for (k = 0; k < rows; k++) {
       working_number = &data_A[partition_size_A*part_ind + k*cols + cols];
-      printf("%d / %d, cols = %d \n", working_number->enu, working_number->den, cols);
       // Identify which rows have a negative/positive/zero coefficient, to determine which will yield a lower bound and which will yield an upper bound
       if (working_number->enu > 0) {
         num_upper++;
         indicators[k] = 1;
+        for (n = 0; n < cols; n++) {
+          divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
+        }
       } else if (working_number->enu < 0) {
         num_lower++;
         indicators[k] = -1;
+        for (n = 0; n < cols; n++) {
+          divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
+        }
       } else {
         indicators[k] = 0;
       }
       // On the same loop, divide each coefficient in that row so we have a 1 at the "right" place
-      for (n = 0; n < cols; n++) {
-        divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
-      }
+
       // Same for the c vector
       divide(&data_c[partition_size_c*part_ind + k], working_number);
     }
@@ -79,8 +83,30 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
     cols = cols_new;
     part_ind++;
   }
+  min.enu = INT_MIN;
+  min.den = 1;
+  max.enu = INT_MAX;
+  max.den = 1;
+
+  for (k = 0; k < rows; k++) {
+    working_number = &data_A[part_ind*partition_size_A + k];
+    help = &data_c[part_ind*partition_size_c + k];
+    if (compare_int(working_number, 0)) {
+      if (compare(&min, help)) {
+        min = *help;
+      } else if (equal_int(working_number, 0)) {
+        if (compare_int(help, 0)) {
+          free(data_A);
+          free(data_c);
+          return 0;
+        }
+      } else if (compare(help, &max)) {
+        max = *help;
+      }
+    }
+  }
 
   free(data_A);
   free(data_c);
-  return 1;
+  return compare(&min, &max);
 }

@@ -41,3 +41,11 @@ bool compare(rational* left, rational* right) {
   rh = right->enu * left->den;
   return lh>rh;
 };
+
+int compare_int(rational* left, int right) {
+  return left->enu < right*left->den;
+};
+
+int equal_int(rational* left, int right) {
+  return (!compare_int(left, right) && !(left->enu > right*left->den));
+};
