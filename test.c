@@ -3,9 +3,9 @@
 #include "rational.c"
 
 int main() {
-  rational x, y;
-  x.enu = 1;
-  x.den = 2;
+  rational x, y, z;
+  x.enu = 10;
+  x.den = 1;
 
   y.enu = 5;
   y.den = 1;
@@ -25,4 +25,7 @@ int main() {
   } else {
     printf("x > y\n");
   }
+
+  z = sub(&x, &y);
+  printf("After subtraction x-y: \n x = %d / %d \n y = %d / %d \n res = %d / %d \n", x.enu, x.den, y.enu, y.den, z.enu, z.den);
 }
