@@ -7,7 +7,7 @@
 #define BUFFER_SIZE (10)
 
 int fm_elim(int rows, int cols, rational* A, rational* c) {
-  rational* data_A, *data_c, *working_number, *help, min, max;
+  rational* data_A, *data_c, working_number, min, max;
   int k, n, k_new, k2, part_ind = 0, partition_size_A = rows*cols*BUFFER_SIZE, partition_size_c = rows*BUFFER_SIZE;
   int indicators[rows*BUFFER_SIZE], num_lower, num_upper, rows_new=0, cols_new;
 
@@ -26,32 +26,26 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
     num_upper = 0;
     num_lower = 0;
     for (k = 0; k < rows; k++) {
-      working_number = &data_A[partition_size_A*part_ind + k*cols + cols - 1];
-      // printf("The working number in row %d is %d / %d \n", k, working_number->enu, working_number->den);
+      working_number = data_A[partition_size_A*part_ind + k*cols + cols - 1];
       // Identify which rows have a negative/positive/zero coefficient, to determine which will yield a lower bound and which will yield an upper bound
-      printf("The first value in c at row %d is: %d / %d, ", k, data_c[partition_size_c*part_ind + k].enu, data_c[partition_size_c*part_ind +k].den);
-      if (working_number->enu > 0) {
+
+      if (working_number.enu > 0) {
         num_upper++;
         indicators[k] = 1;
-        printf("The value of working_number is %d / %d, ", working_number->enu, working_number->den);
-        for (n = 0; n < cols; n++) { //On the last step of this loop, the working_number is for some reason squared. Wth.
-          divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
-          printf("%d / %d, ", working_number->enu, working_number->den);
+        for (n = 0; n < cols; n++) {
+          divide(&data_A[partition_size_A*part_ind + k*cols + n], &working_number);
         }
-        divide(&data_c[partition_size_c*part_ind + k], working_number);
-      } else if (working_number->enu < 0) {
+        divide(&data_c[partition_size_c*part_ind + k], &working_number);
+      } else if (working_number.enu < 0) {
         num_lower++;
         indicators[k] = -1;
-        printf("The value of working_number is %d / %d, ", working_number->enu, working_number->den);
         for (n = 0; n < cols; n++) {
-          divide(&data_A[partition_size_A*part_ind + k*cols + n], working_number);
-          printf("%d / %d, ", working_number->enu, working_number->den);
+          divide(&data_A[partition_size_A*part_ind + k*cols + n], &working_number);
         }
-        divide(&data_c[partition_size_c*part_ind + k], working_number);
+        divide(&data_c[partition_size_c*part_ind + k], &working_number);
       } else {
         indicators[k] = 0;
       }
-      printf("The new value in c at row %d is: %d / %d \n", k, data_c[partition_size_c*part_ind + k].enu, data_c[partition_size_c*part_ind +k].den);
     }
 
     if (cols == 1) {
@@ -99,18 +93,17 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
   max.den = 1;
 
   for (k = 0; k < rows; k++) {
-    working_number = &data_A[part_ind*partition_size_A + k];
-    help = &data_c[part_ind*partition_size_c + k];
+    working_number = data_c[part_ind*partition_size_c + k];
     if (indicators[k] < 0) {
-      if (compare(&min, help)) {
-        min = *help;
+      if (compare(&min, &working_number)) {
+        min = working_number;
       }
     } else if (indicators[k] > 0) {
-      if (compare(help, &max)) {
-        max = *help;
+      if (compare(&working_number, &max)) {
+        max = working_number;
       }
     } else {
-      if (compare_int(help, 0)) {
+      if (compare_int(&working_number, 0)) {
         free(data_A);
         free(data_c);
         return 0;
