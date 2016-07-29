@@ -3,19 +3,22 @@ typedef struct {
   int den;
 } rational;
 
-void mult(rational* left, rational* right) {
-  left->enu = left->enu * right->enu;
-  left->den = left->den * right->den;
-  if (left->den < 0) {
-    left->den*=-1;
-    left->enu*=-1;
+rational mult(rational* left, rational* right) {
+  rational ret;
+  ret.enu = left->enu * right->enu;
+  ret.den = left->den * right->den;
+  if (ret.den < 0) {
+    ret.den*=-1;
+    ret.enu*=-1;
   }
+  return ret;
 };
 
-void inverse(rational* value) {
-  int k = value->enu;
-  value->enu = value->den;
-  value->den = k;
+rational inverse(rational* value) {
+  rational ret;
+  ret.enu = value->den;
+  ret.den = value->enu;
+  return ret;
 };
 
 rational sub(rational* left, rational*right) {
@@ -29,13 +32,12 @@ rational sub(rational* left, rational*right) {
   return ret;
 };
 
-void divide(rational* left, rational* right) {
-  inverse(right);
-  mult(left, right);
-  inverse(right);
+rational divide(rational* left, rational* right) {
+  rational ret = inverse(right);
+  return mult(left, &ret);
 };
 
-bool compare(rational* left, rational* right) {
+int compare(rational* left, rational* right) {
   int lh, rh;
   lh = left->enu * right->den;
   rh = right->enu * left->den;

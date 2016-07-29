@@ -33,16 +33,16 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
         num_upper++;
         indicators[k] = 1;
         for (n = 0; n < cols; n++) {
-          divide(&data_A[partition_size_A*part_ind + k*cols + n], &working_number);
+          data_A[partition_size_A*part_ind + k*cols + n] = divide(&data_A[partition_size_A*part_ind + k*cols + n], &working_number);
         }
-        divide(&data_c[partition_size_c*part_ind + k], &working_number);
+        data_c[partition_size_c*part_ind + k] = divide(&data_c[partition_size_c*part_ind + k], &working_number);
       } else if (working_number.enu < 0) {
         num_lower++;
         indicators[k] = -1;
         for (n = 0; n < cols; n++) {
-          divide(&data_A[partition_size_A*part_ind + k*cols + n], &working_number);
+          data_A[partition_size_A*part_ind + k*cols + n] = divide(&data_A[partition_size_A*part_ind + k*cols + n], &working_number);
         }
-        divide(&data_c[partition_size_c*part_ind + k], &working_number);
+        data_c[partition_size_c*part_ind + k] = divide(&data_c[partition_size_c*part_ind + k], &working_number);
       } else {
         indicators[k] = 0;
       }
