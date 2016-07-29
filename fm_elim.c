@@ -54,6 +54,7 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
     // Find the new rows
     rows_new = rows - (num_lower + num_upper) + num_lower*num_upper;
     if (rows_new == 0) {
+      printf("Exit point 1\n");
       free(data_A);
       free(data_c);
       return 1;
@@ -64,13 +65,18 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
     // Construct the new matrix. Note that I will need different row-indices for this.
     k_new = 0;
     cols_new = cols-1;
+
+    printf("The new A matrix is (%d x %d):\n", rows_new, cols_new);
+
     for(k = 0; k < rows; k++) {
       if (indicators[k] == 1) {
         for(k2 = 0; k2 < rows; k2++) {
           if (indicators[k2] == -1) {
             for (n = 0; n < cols_new; n++) {
               data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n] = sub(&data_A[part_ind*partition_size_A + k*cols + n], &data_A[part_ind*partition_size_A + k2*cols + n]);
+              printf("%d / %d ", data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n].enu, data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n].den);
             }
+            printf("\n");
             data_c[((part_ind + 1)%2)*partition_size_c + k_new] = sub(&data_c[part_ind*partition_size_c + k], &data_c[part_ind*partition_size_c + k2]);
             k_new++;
           }
@@ -78,7 +84,9 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
       } else if (indicators[k] == 0) {
         for (n = 0; n < cols_new; n++) {
           data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n] = data_A[part_ind*partition_size_A + k*cols + n];
+          printf("%d / %d ", data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n].enu, data_A[((part_ind+1)%2)*partition_size_A + k_new*cols_new + n].den);
         }
+        printf("\n");
         data_c[((part_ind + 1)%2)*partition_size_c + k_new] = data_c[part_ind*partition_size_c + k];
         k_new++;
       }
@@ -91,8 +99,9 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
   min.den = 1;
   max.enu = INT_MAX;
   max.den = 1;
-
+  printf("Indicator and c matrix:\n");
   for (k = 0; k < rows; k++) {
+    printf("%d %d / %d \n", indicators[k], data_c[part_ind*partition_size_c + k].enu, data_c[part_ind*partition_size_c + k].den);
     working_number = data_c[part_ind*partition_size_c + k];
     if (indicators[k] < 0) {
       if (compare(&min, &working_number)) {
@@ -104,6 +113,7 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
       }
     } else {
       if (compare_int(&working_number, 0)) {
+        printf("Exit point 2 \n");
         free(data_A);
         free(data_c);
         return 0;
@@ -113,5 +123,6 @@ int fm_elim(int rows, int cols, rational* A, rational* c) {
 
   free(data_A);
   free(data_c);
+  printf("Last exist in Sweden \n");
   return compare(&min, &max);
 }

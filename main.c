@@ -82,7 +82,8 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 
-	ntest = sizeof correct/sizeof correct[0];
+	//ntest = sizeof correct/sizeof correct[0];
+	ntest = 3;
 	nfunc = sizeof fm/sizeof fm[0];
 
 	for (i = 0; i < nfunc; ++i) {
